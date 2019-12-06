@@ -1,0 +1,71 @@
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+
+.teamCreator {
+  .container {
+    max-width: 1000px;
+    margin: 0px auto;
+    padding-bottom: 50px;
+  }
+
+  .row {
+    @include ms-Grid-row;
+    @include ms-fontColor-white;
+    background-color: $ms-color-themeDark;
+    padding: 20px;
+  }
+
+  .column {
+    @include ms-Grid-col;
+    @include ms-lg10;
+    @include ms-xl8;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+  }
+
+  .title {
+    @include ms-font-xl;
+    @include ms-fontColor-white;
+  }
+
+  .subTitle {
+    @include ms-font-l;
+    @include ms-fontColor-white;
+  }
+
+  .description {
+    @include ms-font-l;
+    @include ms-fontColor-white;
+  }
+
+  .teamSection, .channelSection {
+    margin-bottom: 10px;
+  }
+
+
+  .buttons {
+    text-align: right;
+    margin-top: 20px;
+
+    .button {
+      margin: 0 4px;
+    }
+  }
+
+  .success{
+    color: green;
+  }
+  .goTeams{
+    margin-right: 25px;
+  }
+  
+  .error {
+    color: $ms-color-errorText;
+  }
+
+  .sectionTitle{
+    border-bottom: 1px solid rgb(161, 159, 157);
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+  }
+
+}

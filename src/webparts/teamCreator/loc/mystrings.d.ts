@@ -27,6 +27,18 @@ declare interface ITeamCreatorWebPartStrings {
   StartOver: string;
   Again:string;
   OpenTeams: string;
+  
+  //  ボタン
+  Department:string;
+  Project:string;
+  NewEmployee:string;
+  Training:string;
+
+  //  テンプレート一覧
+  DepartmentDesc: string;
+  ProjectDesc: string;
+  NewEmployeeDesc: string;
+  TrainingDesc: string;
 }
 
 declare module 'TeamCreatorWebPartStrings' {

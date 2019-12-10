@@ -1,33 +1,35 @@
 import * as React from 'react';
+
+// SCSS
 import styles from './TeamCreator.module.scss';
+
+// Prop
 import { ITeamCreatorProps } from './ITeamCreatorProps';
 
-import { Icon, IIconStyles, Image, Stack, IStackTokens, Text, ITextStyles } from 'office-ui-fabric-react';
-import { TextField, ITextField } from 'office-ui-fabric-react/lib/TextField';
-import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
-import { PrimaryButton, DefaultButton, ActionButton } from 'office-ui-fabric-react/lib/Button';
-import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
-import { PeoplePicker, PrincipalType, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+// String
 import * as strings from 'TeamCreatorWebPartStrings';
-import { MSGraphClient } from '@microsoft/sp-http';
-import { autobind } from '@uifabric/utilities';
-import { string } from 'prop-types';
-import { Label, ILabelStyles } from 'office-ui-fabric-react/lib/Label';
-import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
-import { IStyleSet } from 'office-ui-fabric-react/lib/Styling';
-import { FocusZone } from 'office-ui-fabric-react/lib/FocusZone';
-// TODO: move this file to Accordion
-import { Accordion } from '@uifabric/experiments/lib/Accordion';
 
+// Office UI Fabric
+import { Image, Stack, IStackTokens, Text, ITextStyles } from 'office-ui-fabric-react';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
+import { PrimaryButton, DefaultButton} from 'office-ui-fabric-react/lib/Button';
+import { Spinner } from 'office-ui-fabric-react/lib/Spinner';
+import { Pivot, PivotItem } from 'office-ui-fabric-react/lib/Pivot';
+
+import { Accordion } from '@uifabric/experiments/lib/Accordion';
 import { Card, ICardTokens, ICardSectionStyles, ICardSectionTokens } from '@uifabric/react-cards';
 import { FontWeights } from '@uifabric/styling';
 
-const labelStyles: Partial<IStyleSet<ILabelStyles>> = {
-  root: { marginTop: 10 }
-};
+// PnP PeoplePicker
+import { PeoplePicker, IPeoplePickerUserItem } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+
+// MSGraphClient
+import { MSGraphClient } from '@microsoft/sp-http';
+
 /**
+ * 0.0.1
  * State of the component
  */
 export enum CreationState {
@@ -50,6 +52,7 @@ export enum CreationState {
 }
 
 /**
+ * 0.0.2
  * App definition returned from App Catalog
  */
 export interface ITeamsApp {
@@ -61,24 +64,26 @@ export interface ITeamsApp {
 }
 
 /**
+ * 0.0.3
+ * TODO：どれが使われてて、どれが使われていないのか整理したい
  * State
  */
 export interface ITeamCreatorState {
   /**
-   * Selected team name. Also used as group name
+   * チーム名
    */
   teamName?: string;
   teamNickName?: string;
   /**
-   * team description
+   * チーム説明
    */
   teamDescription?: string;
   /**
-   * Group owners
+   * 所有者
    */
   owners?: string[];
   /**
-   * group members
+   * メンバー
    */
   members?: string[];
   /**
@@ -86,11 +91,11 @@ export interface ITeamCreatorState {
    */
   createChannel?: boolean;
   /**
-   * channel name
+   * チャネル名
    */
   channelName?: string;
   /**
-   * channel description
+   * チャネル説明
    */
   channelDescription?: string;
   /**
@@ -98,7 +103,7 @@ export interface ITeamCreatorState {
    */
   addTab?: boolean;
   /**
-   * tab name
+   * タブ名
    */
   tabName?: string;
   /**
@@ -122,6 +127,7 @@ export interface ITeamCreatorState {
   addTabToGeneral?: boolean;
   generalTabName?: string;
   template?: string ;
+
 }
 
 export default class TeamCreator extends React.Component<ITeamCreatorProps, ITeamCreatorState,{}> {
@@ -138,74 +144,53 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
 
   public render(): React.ReactElement<ITeamCreatorProps> {
 
+    // State
     const {
       teamName,
       teamNickName,
       teamDescription,
-      createChannel,
-      channelName,
-      channelDescription,
-      addTab,
-      tabName,
       apps,
       creationState,
-      spinnerText,
-      selectedAppId,
-      generalSelectedAppId,
-      addTabToGeneral,
-      generalTabName,
-      template
+      spinnerText
     } = this.state;
 
+    // アプリ一覧
     const appsDropdownOptions: IDropdownOption[] = apps ? apps.map(app => { return { key: app.id, text: app.displayName }; }) : [];
-    
-    const alertClicked = (): void => {
-      alert('Clicked');
-    };
 
+    // Styles of Card 
+    // テンプレートタイトル
     const siteTextStyles: ITextStyles = {
       root: {
         color: '#025F52',
         fontWeight: FontWeights.semibold
       }
     };
+    // テンプレート説明
     const descriptionTextStyles: ITextStyles = {
       root: {
         color: '#333333',
         fontWeight: FontWeights.regular
       }
     };
-    const helpfulTextStyles: ITextStyles = {
-      root: {
-        color: '#333333',
-        fontWeight: FontWeights.regular
-      }
-    };
-    const iconStyles: IIconStyles = {
-      root: {
-        color: '#0078D4',
-        fontSize: 16,
-        fontWeight: FontWeights.regular
-      }
-    };
-    const footerCardSectionStyles: ICardSectionStyles = {
-      root: {
-        borderLeft: '1px solid #F3F2F1'
-      }
+
+    const sectionStackTokens: IStackTokens = { 
+      childrenGap: 20
     };
 
-    const sectionStackTokens: IStackTokens = { childrenGap: 20};
-    const cardTokens: ICardTokens = { childrenMargin: 12,minWidth:'700px'};
-    const footerCardSectionTokens: ICardSectionTokens = { padding: '0px 0px 0px 12px'};
+    const cardTokens: ICardTokens = { 
+      childrenMargin: 12,
+      minWidth:'700px'
+    };
 
+    // レンダリング
     return (
       <div className={styles.teamCreator}>
-       
         <div className={styles.container}>
           {{
             0: 
             <div>
                 <Pivot>
+                  {/** トップタブ */}
                   <PivotItem
                     headerText="トップ"
                     headerButtonProps={{
@@ -213,9 +198,7 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
                       'data-title': 'Application'
                     }}
                     itemIcon="DietPlanNotebook"
-                  >
-
-                    
+                  > 
                     {/** タイトル */}
                     <h2 className={styles.sectionTitle}>{strings.Welcome}</h2>
                     <div className={styles.teamSection}>
@@ -223,7 +206,8 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
                       <TextField required={true} label={strings.TeamNameLabel} value={teamName} onChanged={this._onTeamNameChange.bind(this)}></TextField>
 
                       {/** チームアドレス */}
-                      <TextField required={true} label={strings.TeamNickNameLabel} value={teamNickName} suffix="@rjtk1114.onmicrosoft.com" onChanged={this._onTeamNickNameChange.bind(this)}></TextField>
+                      {/** TODO：suffixに自動的にドメインを入力したい */}
+                      <TextField required={true} label={strings.TeamNickNameLabel} value={teamNickName} suffix="@xxx.onmicrosoft.com" onChanged={this._onTeamNickNameChange.bind(this)}></TextField>
 
                       {/** チーム説明 */}
                       <TextField label={strings.TeamDescriptionLabel} value={teamDescription} onChanged={this._onTeamDescriptionChange.bind(this)}></TextField>
@@ -244,67 +228,40 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
                         personSelectionLimit={3}
                         showHiddenInUI={false}
                         selectedItems={this._onMembersSelected.bind(this)} />
-                    </div>
-                    <div>
                       <ChoiceGroup
                         onChange={this._onTemplateChange.bind(this)}
                         label="テンプレート"
-                        defaultSelectedKey='group'
-                        
+                        defaultSelectedKey='Department'
+
                         options={[
                           {
-                            key: 'group',
+                            key: 'Department',
                             imageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/group.png',
                             selectedImageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/group.png',
-                            text: '部門',
-                            style:{
-                              marginRight: '100px'
-                            }
+                            text: strings.Department
                           },
                           {
-                            key: 'project',
+                            key: 'Project',
                             imageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/project.png',
                             selectedImageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/project.png',
-                            text: 'プロジェクト'
+                            text: strings.Project
                           },
                           {
-                            key: 'child',
+                            key: 'NewEmployee',
                             imageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/child.png',
                             selectedImageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/child.png',
-                            text: '新入社員'
+                            text: strings.NewEmployee
                           },
                           {
-                            key: 'custom',
-                            imageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/edit.png',
-                            selectedImageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/edit.png',
-                            text: '研修'
+                            key: 'Training',
+                            imageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/training.png',
+                            selectedImageSrc: 'https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/training.png',
+                            text: strings.Training
                           }
                         ]}
-                      /></div>
-
-
-                    {template == 'custom' &&
-                      <div>
-
-                        <div className={styles.channelSection}>
-                          <TextField required={createChannel} label={strings.ChannelName} value={channelName} onChanged={this._onChannelNameChange.bind(this)}></TextField>
-                          <TextField label={strings.ChannelDescription} value={channelDescription} onChanged={this._onChannelDescriptionChange.bind(this)}></TextField>
-                        </div>
-                        <Checkbox label={strings.AddTab} checked={addTab} onChange={this._onAddTabChange.bind(this)} />
-                        {addTab && <div>
-                          <TextField required={addTab} label={strings.TabName} value={tabName} onChanged={this._onTabNameChange.bind(this)}></TextField>
-                          <Dropdown
-                            required={addTab}
-                            label={strings.App}
-                            disabled={!this.state.apps}
-                            options={appsDropdownOptions}
-                            selectedKey={selectedAppId}
-                            onChanged={this._onAppSelected.bind(this)}></Dropdown>
-
-                        </div>}
-                      </div>
-                    }
-
+                      />
+                    </div>
+                    {/** ボタン一覧 */}
                     <div className={styles.buttons}>
                       {/** 申請ボタン */}
                       <PrimaryButton text={strings.Create} className={styles.button} onClick={this._onCreateClick.bind(this)} />
@@ -313,44 +270,57 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
                       <DefaultButton text={strings.Clear} className={styles.button} onClick={this._onClearClick} />
                     </div>
                   </PivotItem>
-
+                  
+                  {/** 設定タブ */}
                   <PivotItem headerText="設定" itemIcon='Settings'>
-                   
                     <h2 className={styles.sectionTitle}>テンプレート一覧</h2>
                     <div>
                       <Stack tokens={sectionStackTokens}>
-                        <Card horizontal onClick={alertClicked} tokens={cardTokens}>
+                        {/** 部門 */}
+                        <Card horizontal onClick={this.alertClicked} tokens={cardTokens}>
                           <Card.Item fill>
                             <Image src="https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/group_tem.png" alt="Placeholder image." />
                           </Card.Item>
                           <Card.Section>
-                            <Text variant="small" styles={siteTextStyles}>部門</Text>
-                            <Text styles={descriptionTextStyles}>部門向けのチームテンプレートになります</Text>
+                            <Text variant="small" styles={siteTextStyles}>{strings.Department}</Text>
+                            <Text styles={descriptionTextStyles}>{strings.DepartmentDesc}</Text>
                           </Card.Section>
                         </Card>
 
-                        <Card horizontal onClick={alertClicked} tokens={cardTokens}>
+                        {/** プロジェクト */}
+                        <Card horizontal onClick={this.alertClicked} tokens={cardTokens}>
                           <Card.Item fill>
                             <Image src="https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/project_tem.png" alt="Placeholder image." />
                           </Card.Item>
                           <Card.Section>
-                            <Text variant="small" styles={siteTextStyles}>プロジェクト</Text>
-                            <Text styles={descriptionTextStyles}>プロジェクト向けのチームテンプレートになります</Text>
+                            <Text variant="small" styles={siteTextStyles}>{strings.Project}</Text>
+                            <Text styles={descriptionTextStyles}>{strings.ProjectDesc}</Text>
                           </Card.Section>
                         </Card>
 
-                        <Card horizontal onClick={alertClicked} tokens={cardTokens}>
+                        {/** 新入社員 */}
+                        <Card horizontal onClick={this.alertClicked} tokens={cardTokens}>
                           <Card.Item fill>
                             <Image src="https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/child_tem.png" alt="Placeholder image." />
                           </Card.Item>
                           <Card.Section>
-                            <Text variant="small" styles={siteTextStyles}>新入社員</Text>
-                            <Text styles={descriptionTextStyles}>新入社員向けのチームテンプレートになります</Text>
+                            <Text variant="small" styles={siteTextStyles}>{strings.NewEmployee}</Text>
+                            <Text styles={descriptionTextStyles}>{strings.NewEmployeeDesc}</Text>
+                          </Card.Section>
+                        </Card>
+
+                        {/** 研修 */}
+                        <Card horizontal onClick={this.alertClicked} tokens={cardTokens}>
+                          <Card.Item fill>
+                            <Image src="https://rjtk1114.sharepoint.com/sites/SAMPLE001/SiteAssets/training_tem.png" alt="Placeholder image." />
+                          </Card.Item>
+                          <Card.Section>
+                            <Text variant="small" styles={siteTextStyles}>{strings.Training}</Text>
+                            <Text styles={descriptionTextStyles}>{strings.TrainingDesc}</Text>
                           </Card.Section>
                         </Card>
                       </Stack>
                     </div>
-
                   </PivotItem>
                 </Pivot>
 
@@ -372,63 +342,26 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
       </div>
     );
   }
+
+  
   //  チーム名
   private _onTeamNameChange(value: string) {
     this.setState({
       teamName: value
     });
   }
+
+  //  チームアドレス
   private _onTeamNickNameChange(value: string) {
     this.setState({
       teamNickName: value
     });
   }
+  
   //  チーム説明
   private _onTeamDescriptionChange(value: string) {
     this.setState({
       teamDescription: value
-    });
-  }
-  
-  //  チャネル名
-  private _onChannelNameChange(value: string) {
-    this.setState({
-      channelName: value
-    });
-  }
-
-  //  チャネル説明
-  private _onGeneralTabNameChange(value: string) {
-    this.setState({
-      generalTabName: value
-    });
-  }
-
-  //  チャネル説明
-  private _onChannelDescriptionChange(value: string) {
-    this.setState({
-      channelDescription: value
-    });
-  }
-
-  //  タブ名
-  private _onTabNameChange(value: string) {
-    this.setState({
-      tabName: value
-    });
-  }
-
-  //  アプリの選択
-  private _onAppSelected(item: IDropdownOption) {
-    this.setState({
-      selectedAppId: item.key as string
-    });
-  }
-
-  //  アプリの選択
-  private _onGeneralAppSelected(item: IDropdownOption) {
-    this.setState({
-      generalSelectedAppId: item.key as string
     });
   }
   
@@ -439,31 +372,6 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
     this.setState({
       template: optionKey
     });
-  }
-
-  //  チャネルの追加
-  private _onCreateChannelChange(e: React.FormEvent<HTMLElement | HTMLInputElement>, checked: boolean) {
-    this.setState({
-      createChannel: checked
-    });
-  }
-
-  //  タブの追加
-  private _onAddTabChange(e: React.FormEvent<HTMLElement | HTMLInputElement>, checked: boolean) {
-    this.setState({
-      addTab: checked
-    });
-
-    this._getAvailableApps();
-  }
-
-  //  タブの追加
-  private _onAddTabToGeneralChange(e: React.FormEvent<HTMLElement | HTMLInputElement>, checked: boolean) {
-    this.setState({
-      addTabToGeneral: checked
-    });
-
-    this._getAvailableApps();
   }
 
   //　メンバー
@@ -490,6 +398,12 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
   //  キャンセル
   private _onClearClick() {
     this._clearState();
+  }
+
+  //  テンプレート一覧クリック
+  private alertClicked(){
+
+
   }
 
   private _clearState() {
@@ -540,39 +454,37 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
    * Main flow
    */
   private async _processCreationRequest(): Promise<void> {
+    
     const context = this.props.context;
-    // Graph Client の初期化
-    const graphClient = await context.msGraphClientFactory.getClient();
-
+    
     this.setState({
       creationState: CreationState.creating,
       spinnerText: strings.CreatingGroup
     });
 
-    //
-    // Office365 グループ作成
-    //
+    //  1.0 Graph Client の初期化
+    const graphClient = await context.msGraphClientFactory.getClient();
+
+    //  1.1 Office365 グループ作成
     const groupId = await this._createGroup(graphClient);
     
     if (!groupId) {
       this._onError();
       return;
     }
-    console.log(groupId);
 
     this.setState({
       spinnerText: strings.CreatingTeam
     });
 
-    //
-    // チーム作成
-    //
+    //  1.2 チーム作成
     const teamId = await this._createTeamWithAttempts(groupId, graphClient);
     if (!teamId) {
       this._onError();
       return;
     }
 
+    //  テンプレート
     if (this.state.template == 'group') {
       
       this._getAvailableApps();
@@ -647,240 +559,12 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
 
     } else if (this.state.template == 'project') {
 
-    } else {
-      //
-      //  一般チャネルを取得
-      //
-      //const generalChannelId = this._getChannel(teamId,graphClient);
-      //if (!generalChannelId){
-      //  this._onError();
-      //  return;
-      //}
-
-      //
-      //  一般チャネルにタブ追加
-      //
-      //const isInstalledToGeneral = await this._installApp(teamId, this.state.generalSelectedAppId,graphClient);
-      //if (!isInstalledToGeneral) {
-      //  this._onError();
-      //  return;
-
-      //}
-      //const isTabCreatedToGeneral = await this._addTab(teamId, await generalChannelId, this.state.generalSelectedAppId, graphClient);
-      //if (!isTabCreatedToGeneral) {
-      //  this._onError();
-      //  return;
-      //}
-
-      //if (!this.state.createChannel) {
-      this.setState({
-        creationState: CreationState.created
-      });
-      //return;
-      //}
-
-      this.setState({
-        spinnerText: strings.CreatingChannel
-      });
-
-      //
-      // チャネル作成
-      //
-      const channelId = await this._createChannel(teamId, graphClient);
-      if (!channelId) {
-        this._onError();
-        return;
-      }
-      // 
-      //  タブ追加にチェックが入っていれば次に進む
-      //
-      if (!this.state.addTab) {
-        this.setState({
-          creationState: CreationState.created
-        });
-        return;
-      }
-
-      this.setState({
-        spinnerText: strings.InstallingApp
-      });
-
-      //
-      // アプリインストール
-      //
-      const isInstalled = await this._installApp(teamId, this.state.selectedAppId, graphClient);
-      if (!isInstalled) {
-        this._onError();
-        return;
-      }
-
-      this.setState({
-        spinnerText: strings.CreatingTab
-      });
-
-      //
-      // タブ追加
-      //
-      const isTabCreated = await this._addTab(teamId, channelId, this.state.selectedAppId, graphClient);
-      if (!isTabCreated) {
-        this._onError();
-      }
-      else {
-        this.setState({
-          creationState: CreationState.created
-        });
-      }
-    }
+    } 
   }
 
-  private async _addGroupTab(teamId: string, channelId: string,tabName:string ,appId: string, graphClient: MSGraphClient):Promise<void>{
-
-    //
-    // タブ追加
-    //
-    const isTabCreated = await this._addGroupTab2(teamId, channelId, tabName,appId, graphClient);
-    if (!isTabCreated) {
-      this._onError();
-    }
-    else {
-      this.setState({
-        creationState: CreationState.created
-      });
-    }
-  }
-
-  private _onError(message?: string): void {
-    this.setState({
-      creationState: CreationState.error
-    });
-  }
 
   /**
-   * Installs the app to the team
-   * @param teamId team Id
-   * @param graphClient graph client
-   */
-  private async _installApp(teamId: string, selectedAppId:string , graphClient: MSGraphClient): Promise<boolean> {
-    try {
-      await graphClient.api(`teams/${teamId}/installedApps`).version('v1.0').post({
-        'teamsApp@odata.bind': `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/${selectedAppId}`
-      });
-    }
-    catch (error) {
-      console.error(error);
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Adds tab to the specified channel of the team
-   * @param teamId team id
-   * @param channelId channel id
-   * @param graphClient graph client
-   */
-  private async _addTab(teamId: string, channelId: string, selectedAppId:string,graphClient: MSGraphClient): Promise<boolean> {
-    try {
-      await graphClient.api(`teams/${teamId}/channels/${channelId}/tabs`).version('v1.0').post({
-        displayName: this.state.tabName,
-        'teamsApp@odata.bind': `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/${selectedAppId}`
-      });
-    }
-    catch (error) {
-      console.error(error);
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Adds tab to the specified channel of the team
-   * @param teamId team id
-   * @param channelId channel id
-   * @param graphClient graph client
-   */
-  private async _addGroupTab2(teamId: string, channelId: string, tabName:string,selectedAppId: string, graphClient: MSGraphClient): Promise<boolean> {
-    try {
-      await graphClient.api(`teams/${teamId}/channels/${channelId}/tabs`).version('v1.0').post({
-        displayName: tabName,
-        'teamsApp@odata.bind': `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/${selectedAppId}`
-      });
-    }
-    catch (error) {
-      console.error(error);
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Creates channel in the team
-   * @param teamId team id
-   * @param graphClient graph client
-   */
-  private async _createChannel(teamId: string, graphClient: MSGraphClient): Promise<string> {
-    const {
-      channelName,
-      channelDescription
-    } = this.state;
-
-    try {
-      const response = await graphClient.api(`teams/${teamId}/channels`).version('v1.0').post({
-        displayName: channelName,
-        description: channelDescription
-      });
-
-      return response.id;
-    }
-    catch (error) {
-      console.error(error);
-      return '';
-    }
-  }
-
-  /**
-   * Creates channel in the team
-   * @param teamId team id
-   * @param graphClient graph client
-   */
-  private async _createGroupChannel(teamId: string, channelName: string, channelDescription:string,graphClient: MSGraphClient): Promise<string> {
-    try {
-      const response = await graphClient.api(`teams/${teamId}/channels`).version('v1.0').post({
-        displayName: channelName,
-        description: channelDescription
-      });
-
-      return response.id;
-    }
-    catch (error) {
-      console.error(error);
-      return '';
-    }
-  }
-
-  /**
- * Creates channel in the team
- * @param teamId team id
- * @param graphClient graph client
- */
-  private async _getChannel(teamId: string, graphClient: MSGraphClient): Promise<string> {
-
-    try {
-      const response = await graphClient.api(`teams/${teamId}/channels`).version('v1.0').get();
-      console.log(response);
-      return response.id;
-    }
-    catch (error) {
-      console.error(error);
-      return '';
-    }
-  }
-
-  /**
-   * Creates O365 group
+   * 1.1 Creates O365 group
    * @param graphClient graph client
    */
   private async _createGroup(graphClient: MSGraphClient): Promise<string> {
@@ -902,34 +586,30 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
       mailNickname: mailNickname,
       securityEnabled: false
     };
+
     if (owners && owners.length) {
       groupRequest['owners@data.bind'] = owners.map(owner => {
-        console.log(owner);
         return `https://graph.microsoft.com/v1.0/users/${owner}`;
       });
     }
     if (members && members.length) {
       groupRequest['members@data.bind'] = members.map(member => {
-        console.log(member);
         return `https://graph.microsoft.com/v1.0/users/${member}`;
       });
     }
 
-    console.log(groupRequest);
 
     try {
       const response = await graphClient.api('groups').version('v1.0').post(groupRequest);
-      console.log(response);
       return response.id;
     }
     catch (error) {
-      console.error(error);
       return '';
     }
   }
 
   /**
-   * Creates team. as mentioned in the documentation - we need to make multiple attempts if team creation request errored
+   * 1.2 Creates team. as mentioned in the documentation - we need to make multiple attempts if team creation request errored
    * @param groupId group id
    * @param graphClient graph client
    */
@@ -985,10 +665,160 @@ export default class TeamCreator extends React.Component<ITeamCreatorProps, ITea
   }
 
   /**
+   * 1.3 Creates channel in the team
+   * @param teamId team id
+   * @param graphClient graph client
+   */
+  private async _createGroupChannel(teamId: string, channelName: string, channelDescription: string, graphClient: MSGraphClient): Promise<string> {
+    try {
+      const response = await graphClient.api(`teams/${teamId}/channels`).version('v1.0').post({
+        displayName: channelName,
+        description: channelDescription
+      });
+
+      return response.id;
+    }
+    catch (error) {
+      console.error(error);
+      return '';
+    }
+  }
+
+  /**
+   * 1.4 Installs the app to the team
+   * @param teamId team Id
+   * @param graphClient graph client
+   */
+  private async _installApp(teamId: string, selectedAppId: string, graphClient: MSGraphClient): Promise<boolean> {
+    try {
+      await graphClient.api(`teams/${teamId}/installedApps`).version('v1.0').post({
+        'teamsApp@odata.bind': `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/${selectedAppId}`
+      });
+    }
+    catch (error) {
+      console.error(error);
+      return false;
+    }
+
+    return true;
+  }
+
+  private async _addGroupTab(teamId: string, channelId: string, tabName: string, appId: string, graphClient: MSGraphClient): Promise<void> {
+
+    //
+    // タブ追加
+    //
+    const isTabCreated = await this._addGroupTab2(teamId, channelId, tabName, appId, graphClient);
+    if (!isTabCreated) {
+      this._onError();
+    }
+    else {
+      this.setState({
+        creationState: CreationState.created
+      });
+    }
+  }
+
+  private _onError(message?: string): void {
+    this.setState({
+      creationState: CreationState.error
+    });
+  }
+  /**
+   * 1.5 Adds tab to the specified channel of the team
+   * @param teamId team id
+   * @param channelId channel id
+   * @param graphClient graph client
+   */
+  private async _addGroupTab2(teamId: string, channelId: string, tabName: string, selectedAppId: string, graphClient: MSGraphClient): Promise<boolean> {
+    try {
+      await graphClient.api(`teams/${teamId}/channels/${channelId}/tabs`).version('v1.0').post({
+        displayName: tabName,
+        'teamsApp@odata.bind': `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/${selectedAppId}`
+      });
+    }
+    catch (error) {
+      console.error(error);
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Generates mail nick name by display name of the group
    * @param displayName group display name
    */
   private _generateMailNickname(displayName: string): string {
     return displayName.toLowerCase().replace(/\s/gmi, '-');
   }
+
+
+  // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+  // ↓↓↓↓↓↓ 残骸 ↓↓↓↓↓↓↓
+  // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+  ///**
+  // * Creates channel in the team
+  // * @param teamId team id
+  // * @param graphClient graph client
+  // */
+  //private async _createChannel(teamId: string, graphClient: MSGraphClient): Promise<string> {
+  //  const {
+  //    channelName,
+  //    channelDescription
+  //  } = this.state;
+//
+  //  try {
+  //    const response = await graphClient.api(`teams/${teamId}/channels`).version('v1.0').post({
+  //      displayName: channelName,
+  //      description: channelDescription
+  //    });
+//
+  //    return response.id;
+  //  }
+  //  catch (error) {
+  //    console.error(error);
+  //    return '';
+  //  }
+  //}
+  ///**
+ // Creates channel in the team
+ // @param teamId team id
+ // @param graphClient graph client
+ ///
+  //private async _getChannel(teamId: string, graphClient: MSGraphClient): Promise<string> {
+//
+  //  try {
+  //    const response = await graphClient.api(`teams/${teamId}/channels`).version('v1.0').get();
+  //    console.log(response);
+  //    return response.id;
+  //  }
+  //  catch (error) {
+  //    console.error(error);
+  //    return '';
+  //  }
+  //}
+//
+//
+  ///**
+  // * Adds tab to the specified channel of the team
+  // * @param teamId team id
+  // * @param channelId channel id
+  // * @param graphClient graph client
+  // */
+  //private async _addTab(teamId: string, channelId: string, selectedAppId: string, graphClient: MSGraphClient): Promise<boolean> {
+  //  try {
+  //    await graphClient.api(`teams/${teamId}/channels/${channelId}/tabs`).version('v1.0').post({
+  //      displayName: this.state.tabName,
+  //      'teamsApp@odata.bind': `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/${selectedAppId}`
+  //    });
+  //  }
+  //  catch (error) {
+  //    console.error(error);
+  //    return false;
+  //  }
+//
+  //  return true;
+  //}
 }

@@ -7,14 +7,14 @@ npm-debug.log*
 node_modules
 
 # Build generated files
-dist
-lib
-solution
-temp
-*.sppkg
+#dist
+#lib
+#solution
+#temp
+#*.sppkg
 
 # Coverage directory used by tools like istanbul
-coverage
+#coverage
 
 # OSX
 .DS_Store
@@ -26,7 +26,7 @@ bin
 obj
 
 # Resx Generated Code
-*.resx.ts
+#*.resx.ts
 
 # Styles Generated Code
-*.scss.ts
+#*.scss.ts
